@@ -1,0 +1,290 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     Int                     @id @default(autoincrement())
+  email                  String                  @unique
+  password               String                  @db.VarChar(800)
+  userban                User_ban?
+  jwtoken                Jwtoken_revoqued?
+  role                   User_role?
+  active                 Boolean                 @default(false)
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  jwtoken_active_user    Jwtoken_active_user?
+  profile                Profile?
+  jwtoken_reset_password jwtoken_reset_password?
+}
+
+model settingsAdmin {
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  mailAdmin mailAdmin?
+}
+
+model mailAdmin {
+  id              Int           @id @default(autoincrement())
+  name            String        @default("Email")
+  emailAdmin      String        @default("example.admin@etoileroyale.com")
+  email           String
+  password        String        @db.VarChar(800)
+  service         String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  settings        settingsAdmin @relation(fields: [settingsAdminId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  settingsAdminId Int           @unique
+}
+
+model Profile {
+  lastName     String @db.VarChar(255)
+  firstName    String @db.VarChar(255)
+  languagePref String @default("fr") @db.VarChar(2)
+  user         User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId       Int    @unique
+}
+
+model User_ban {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+  createdAt DateTime @default(now())
+}
+
+model Jwtoken_revoqued {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+}
+
+model jwtoken_reset_password {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId    Int      @unique
+}
+
+model Jwtoken_active_user {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId    Int      @unique
+}
+
+model User_role {
+  id      Int  @id @default(autoincrement())
+  role    Role @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roleId  Int  @db.Int
+  user    User @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user_id Int  @unique
+}
+
+model Role {
+  id            Int             @id @default(autoincrement())
+  name          enum_role       @unique
+  user_role     User_role[]
+  authorization Authorization[]
+}
+
+enum enum_role {
+  ADMIN
+  USER
+  GUEST
+}
+
+model Authorization {
+  id        Int         @id @default(autoincrement())
+  role      Role        @relation(fields: [nameRole], references: [name], onUpdate: Cascade, onDelete: Cascade)
+  nameRole  enum_role
+  ressource String      @db.VarChar(255)
+  action    enum_action
+
+  @@unique([nameRole, ressource, action])
+}
+
+enum enum_action {
+  READ
+  WRITE
+  UPDATE
+  DELETE
+}
+
+model Maintenance {
+  id           Int                        @id @default(autoincrement())
+  name         String                     @unique @db.VarChar(255)
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @updatedAt
+  status       Boolean                    @default(false)
+  translations Maintenance_translations[]
+
+  @@unique([name], map: "unique_maintenance_name")
+}
+
+model Maintenance_translations {
+  id             Int         @id @default(autoincrement())
+  message        String      @db.LongText
+  language       String      @unique @db.VarChar(2)
+  maintenance    Maintenance @relation(fields: [maintenance_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  maintenance_id Int
+}
+
+model Post {
+  id               Int                 @id @default(autoincrement())
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  published        Boolean             @default(false)
+  slug             String              @unique @db.VarChar(255)
+  type             enum_postType
+  Photography_post Photography_post?
+  Realization_post Realization_post?
+  text_post        Text_post?
+  blog_post        Blog_post?
+  imagesPost       Image_post[]
+  post_tags        Post_tags[]
+  post_video       Video_post[]
+  translations     Post_translations[]
+
+  @@unique([slug], map: "unique_slug")
+}
+
+enum enum_postType {
+  PHOTOGRAPHY
+  REALIZATION
+  TEXT
+  BLOG
+}
+
+model Post_translations {
+  id       Int    @id @default(autoincrement())
+  content  String @db.LongText
+  title    String @db.VarChar(255)
+  language String @db.VarChar(2)
+  post     Post   @relation(fields: [post_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  post_id  Int    @db.Int
+
+  @@unique([title, language, post_id])
+}
+
+model Post_tags {
+  id      Int  @id @default(autoincrement())
+  tag     Tags @relation(fields: [tag_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  tag_id  Int  @db.Int
+  post    Post @relation(fields: [post_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  post_id Int  @db.Int
+
+  @@unique([tag_id, post_id])
+}
+
+model Photography_post {
+  id         Int    @id @default(autoincrement())
+  post       Post   @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  postId     Int    @unique
+  thumbnails String @db.VarChar(255)
+  image      String @db.VarChar(255)
+}
+
+model Blog_post {
+  id         Int    @id @default(autoincrement())
+  post       Post   @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  postId     Int    @unique
+  thumbnails String @db.VarChar(255)
+  image      String @db.VarChar(255)
+}
+
+model Text_post {
+  id        Int      @id @default(autoincrement())
+  published Boolean  @default(false)
+  post      Post     @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  postId    Int      @unique
+}
+
+model Realization_post {
+  id         Int    @id @default(autoincrement())
+  thumbnails String @db.VarChar(255)
+  image      String @db.VarChar(255) 
+  video      String @db.VarChar(500) @default("")
+  post       Post   @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  postId     Int    @unique
+}
+
+
+model Image_post {
+  id        Int      @id @default(autoincrement())
+  image     String   @db.VarChar(255)
+  post      Post     @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  postId    Int  
+
+  @@unique(name: "unique_image_post",[image, postId], map: "unique_image_post")
+}
+
+
+model Video_post {
+  id        Int      @id @default(autoincrement())
+  video     String   @db.VarChar(255)
+  post      Post     @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  postId    Int      @unique
+}
+
+model Tags {
+  id            Int             @id @default(autoincrement())
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  tag_translate Tag_translate[]
+  post_tags     Post_tags[]
+}
+
+model Tag_translate {
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(255)
+  language String @db.VarChar(2)
+  tag      Tags   @relation(fields: [tag_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  tag_id   Int
+
+  @@unique([name, language])
+}
+
+model slider {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique @db.VarChar(255)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  published      Boolean          @default(false)
+  slider_content slider_content[]
+
+  @@unique([name], map: "unique_slider_name")
+}
+
+model slider_content {
+  id                 Int                  @id @default(autoincrement())
+  slider             slider               @relation(fields: [sliderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  sliderId           Int                  @db.Int
+  link               String               @db.VarChar(255)
+  image              String               @db.VarChar(255)
+  slider_translation slider_translation[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+}
+
+model slider_translation {
+  id                Int            @id @default(autoincrement())
+  title             String         @db.VarChar(255)
+  content           String         @db.LongText
+  language          String         @db.VarChar(2)
+  slider_content    slider_content @relation(fields: [slider_content_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  slider_content_id Int
+}
+
+

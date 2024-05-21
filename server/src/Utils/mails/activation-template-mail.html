@@ -1,0 +1,36 @@
+<!-- activation-email-template.html -->
+<!DOCTYPE html>
+<html lang="{{language}}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{subject}}</title>
+</head>
+
+<body style="font-family: 'Arial', sans-serif; padding: 20px; text-align: center; width: 50%;">
+
+    <!-- Header Section -->
+    <header style="background-color: #3498db; color: #fff; padding: 10px;">
+        <h2>{{title}}</h2>
+    </header>
+
+    <!-- Main Content Section -->
+    <section style="margin: 20px 0;">
+        <div style="width: 25%; height: 25%; margin:auto; ">
+            <img src="{{logoUrl}}" alt="Logo" style="width: 100px; height: 100px; margin: 0 auto;">
+        </div>
+        <p>{{greeting}}</p>
+        <p>{{content}}</p>
+        <!-- Activation Button -->
+        <a href="{{activationLink}}" style="display: inline-block; padding: 10px 20px; background-color: #2ecc71; color: #fff; text-decoration: none; border-radius: 5px;">{{activateButton}}</a>
+    </section>
+
+    <!-- Footer Section -->
+    <footer style="margin-top: 20px;">
+        <p>{{footerText}}</p>
+    </footer>
+
+</body>
+
+</html>
