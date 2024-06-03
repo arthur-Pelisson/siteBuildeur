@@ -3,16 +3,16 @@ import { useLanguage } from "@/contextProvider/languageProvider";
 
 const tradMetadata = {
     title: {
-        fr: "Déconnexion",
-        en: "Disconnect",
+        fr: "Réinitialiser le mot de passe",
+        en: "Reset password",
     },
     description: {
-        fr: "Page de déconnexion",
-        en: "Disconnect page",
+        fr: "Page de réinitialisation du mot de passe",
+        en: "Reset password page",
     },
 };
 
-export default function DeconnectionLayout({ children }: { children: React.ReactNode }) {
+export default function ResetPasswordLayout({ children }: { children: React.ReactNode }) {
     const { language } = useLanguage();
     
     return (

@@ -1,13 +1,15 @@
 'use client'
 import { useToken } from '@/contextProvider/tokenProvider';
+import { usePathname } from 'next/navigation';
 
 const usePatheRules = () => {
     // const [authorisation, setAuthorisation] = useState<boolean | null>(null);
     // const [redirect, setRedirect] = useState<string>("");
+    const pathname = usePathname();
     const { token } = useToken();
 
     const getAuthorisation = () => {
-        const path = window.location.pathname;
+        
         let signIn;
         console.log("token usePathRule : ", token);
         // if (token === null ) return {authorisation: true, redirect: ""};
@@ -18,10 +20,10 @@ const usePatheRules = () => {
         }
 
         console.log("signIn : ", signIn);
-        if (path.slice(0, path.length -1) === "/auth/connection" && !signIn) {
+        if (pathname.slice(0, pathname.length -1) === "/auth/connection" && !signIn) {
             return {authorisation: true, redirect: ""};
         }
-        if (path.slice(0, path.length -1) === "/auth/connection" && signIn) {
+        if (pathname.slice(0, pathname.length -1) === "/auth/connection" && signIn) {
             console.log("okok")
             return {authorisation: false, redirect: "/"};
         }

@@ -29,6 +29,13 @@ export type FormField = {
 }
 
 export type TFormTranslate = {
-    [key: string]: any;
+    [key: string]: {
+      fr, en
+    };
     
 }
+
+export type errorType = {
+  fr: string;
+  en: string;
+};

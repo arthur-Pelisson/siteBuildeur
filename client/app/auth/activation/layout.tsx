@@ -21,9 +21,7 @@ const ActivationLayout = ({ children }) => {
         <>
             <title>{tradMetadata.title[language]}</title>
             <meta name="description" content={tradMetadata.description[language]} />
-            <section className="min-height-section">
-                    {children}
-            </section>
+            {children}
         </>
     );
 };

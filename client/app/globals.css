@@ -200,23 +200,23 @@ section {
 
 /* /////////////////////////////////////////////////////////// */
 
-.btn {
+.btn-black {
   background-color: black !important;
   color: white !important;
   border:1px solid white !important;
 }
 
-.btn-reverse {
+.btn-black-reverse {
   background-color: white !important;
   color: black !important;
   border:1px solid black !important;
 }
-.btn-reverse:hover {
+.btn-black-reverse:hover {
   background-color: black !important;
   color: white !important;
   border:1px solid white !important;
 }
-.btn:hover {
+.btn-black:hover {
   background-color: rgb(245, 235, 235) !important;
   color: black !important;
   border-color: black !important;

@@ -47,7 +47,7 @@ class App {
         await role.init();
         await maintenance.init();
         await settings.init();
-        await postController.initParagraphe(['aboutLeft', 'aboutRight', 'contact', 'home', 'footer']);
+        await postController.initParagraphe(['aboutLeft', 'aboutRight', 'contact', 'home', 'footer', "privacy", "legal notice"]);
         this.runLoadSecurity();
         this.setStaticFiles();
         this.app.get("/test", (req, res) => {

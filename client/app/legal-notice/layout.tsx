@@ -3,18 +3,17 @@ import { useLanguage } from "@/contextProvider/languageProvider";
 
 const tradMetadata = {
     title: {
-        fr: "Déconnexion",
-        en: "Disconnect",
+        fr: "Mentions légales",
+        en: "Legal notice",
     },
     description: {
-        fr: "Page de déconnexion",
-        en: "Disconnect page",
+        fr: "Page de mentions légales pour le site de Margaux PELISSON, photographie de portrait, mariage, événement, etc...",
+        en: "Legal notice page for Margaux PELISSON's site, portrait, wedding, event photography, etc...",
     },
 };
 
-export default function DeconnectionLayout({ children }: { children: React.ReactNode }) {
+export default function AboutLayout({ children }: { children: React.ReactNode }) {
     const { language } = useLanguage();
-    
     return (
         <>
             <title>{tradMetadata.title[language]}</title>

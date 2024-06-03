@@ -13,6 +13,7 @@ const routes = (app: express.Express) => {
     app.post("/post/:type",  SecurityController.checkAuthorization, postController.createPost);
     app.put("/post/:type/:id",  SecurityController.checkAuthorization, postController.updatePost);
     app.delete("/post/:type/:id",  SecurityController.checkAuthorization, postController.deletePost);
+    app.delete("/posts/:type",  SecurityController.checkAuthorization, postController.deleteMultiplePosts);
     app.patch("/post/:type/publishe/:id",  SecurityController.checkAuthorization, postController.publierPost);
 };
 

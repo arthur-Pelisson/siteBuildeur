@@ -1,4 +1,4 @@
-import { FormField, formTranslate } from "@/app/types/formValidation"
+import {FormField, TFormTranslate} from "@/app/types/formValidation"
 
 const form: FormField[] = [
     
@@ -45,7 +45,7 @@ const form: FormField[] = [
     }
 ]
 
-const formTranslate: formTranslate = {
+const formTranslate: TFormTranslate = {
     title: {
         fr: "Connexion",
         en: "Connection",
@@ -57,6 +57,10 @@ const formTranslate: formTranslate = {
     forgotPassword: {
         fr: "Mot de passe oublié",
         en: "Forgot password",
+    },
+    forgotPasswordLink: {
+        fr: "Réinitialiser",
+        en: "Reset",
     },
     error: {
         fr: "Mots de passe ou email incorrect",

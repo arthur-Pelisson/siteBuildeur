@@ -1,7 +1,7 @@
 "use client";
 import Loading from "@/components/loading/loading";
 import { Autocomplete, Button, CardActions, Checkbox, CircularProgress, TextField, Tooltip } from "@mui/material";
-import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useCallback, use } from "react";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/material/styles";
 import { getMedias, uploadMedia, deleteMedia } from "@/app/request/requestMedias";
@@ -13,7 +13,7 @@ import centerGrid from "../layoutComp/centerGrid";
 import AlertDialog from "../snackBar/confirmDialog";
 import { usePathname } from "next/navigation";
 import DeleteIcon from "@mui/icons-material/Delete";
-
+import useInfinitScroll from "@/hooks/useInfiniScroll"; 
 
 const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
@@ -250,23 +250,25 @@ const DisplayMedias = ({ addMedia, deleteFile, selecteFile, searchInput, callBac
     const [mediaToDelete, setMediaToDelete] = useState<string[]>([]);
     const mainDiv = useRef<HTMLElement>(null);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const [filteredMedias, setFilteredMedias] = useState<string>("");
     const [isReady, setIsReady] = useState(false);
     const [multipleSelect, setMultipleSelect] = useState<string[]>([]);
     const [ready, setReady] = useState<boolean[]>([]);
     const pathname = usePathname();
-    const [nomorePage, setNomorePage] = useState<boolean>(false);
-    const [page, setPage] = useState<number>(0);
-    const lazyRef = useRef<HTMLDivElement>(null);
     const [uploadedFile, setUploadedFile] = useState<string[]>([]);
-    const [filterString, setFilterString] = useState<string>("");
-    
+    const [nomorePage, setNomorePage] = useState<boolean>(false);
+    const { loadMoreRef, page, setPage } = useInfinitScroll({stopPage: nomorePage});
     const handleResize = useCallback(() => {
         centerGrid(mainDiv, setIsReady);
     }, [mainDiv.current, setIsReady]);
-
+    console.log("nomorepage start comp: " , nomorePage);
     useEffect(() => {
         FGetMedia({ url: getMediasParams.url, method: getMediasParams.method });
     }, []);
+
+    useEffect(() => {
+        console.log("nomorePage useeffcect", nomorePage);
+    }, [nomorePage]);
 
     useLayoutEffect(() => {
         // Initial centering
@@ -282,28 +284,6 @@ const DisplayMedias = ({ addMedia, deleteFile, selecteFile, searchInput, callBac
         };
     }, [mainDiv.current, medias]);
 
-    useEffect(() => {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                console.log("observer filter string : ", filterString)
-                if (entry.isIntersecting && !nomorePage && filterString === "") {
-                    setPage((prev) => prev + 1);
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1, rootMargin: "0px" });
-
-        if (lazyRef.current) {
-            if (lazyRef.current) {
-                observer.observe(lazyRef.current);
-            }
-        }
-        return () => {
-            if (lazyRef.current) {
-                observer.unobserve(lazyRef.current);
-            }
-        }
-    }, [lazyRef.current, page, filterString]);
 
     useEffect(() => {
         console.log("addMedia", addMedia);
@@ -317,7 +297,7 @@ const DisplayMedias = ({ addMedia, deleteFile, selecteFile, searchInput, callBac
             return sortByName(newMedias);
         });
         console.log("addMedias", addMedias);
-        console.log("medias", medias);
+        // console.log("medias", medias);
         const mediasToSort = [...medias, ...addMedias];
         console.log("mediasToSort", mediasToSort);
         const sortedMedias  = sortByName(mediasToSort);
@@ -377,18 +357,19 @@ const DisplayMedias = ({ addMedia, deleteFile, selecteFile, searchInput, callBac
     }, [page, saveRespMedia]);
 
     const getMediasByPage = (page: number) => {
+        
         console.log("page", page);
         console.log("saveRespMedia", saveRespMedia);
         if (saveRespMedia.length === 0) {
             setNomorePage(true);
             return;
-        };
+        } else setNomorePage(false);
         const mediasPage:string [] = [];
         for (let i = 0; i < page*10; i++) {
             if (saveRespMedia[i] === undefined) {
                 setNomorePage(true);
                 break;
-            };
+            } else setNomorePage(false);
             mediasPage.push(saveRespMedia[i]);
         }
 
@@ -419,10 +400,15 @@ const DisplayMedias = ({ addMedia, deleteFile, selecteFile, searchInput, callBac
     };
 
     const filterSearchInput = (value: string) => {
-        setFilterString(value);
-        console.log("value", value);
-        console.log("response medias serch input :", saveRespMedia);
-        console.log("medias: ", medias);
+        if (value !== "") {
+            setNomorePage(true)
+        } else {
+            setNomorePage(false);
+        }
+        setFilteredMedias(value);
+        console.log("value filterSerchInput", value);
+        // console.log("response medias serch input :", saveRespMedia);
+        // console.log("medias: ", medias);
         if (saveRespMedia === null) return;
         if (value === "" && saveRespMedia !== null) {
             setMedias(saveRespMedia as string[]);
@@ -461,15 +447,6 @@ const DisplayMedias = ({ addMedia, deleteFile, selecteFile, searchInput, callBac
         FdeleteMedia({ url: deleteMediaParams.url, method: deleteMediaParams.method, data: mediasToDelete });
     };
 
-    // if (loadingMedias) {
-    //     return (
-    //         <>
-    //             <Loading display={true} />
-    //         </>
-    //     );
-    // }
-    // console.log("mediassss", medias);
-    // console.log("isReady", isReady);
     return (
         <>
             <div className="flex justify-center flex-col flex-wrap m-0 items-center min-h-[350px]">
@@ -562,7 +539,7 @@ const DisplayMedias = ({ addMedia, deleteFile, selecteFile, searchInput, callBac
                         );
                     })}
                 </div>
-                    <div ref={lazyRef} className="h-[350px] w-[100%]">
+                    <div ref={loadMoreRef} className="h-[350px] w-[100%]">
 
                     </div>
             </div>
@@ -656,7 +633,7 @@ const SearchMedias = ({ callBackStringSearch, medias }) => {
                     disablePortal={false}
                     disableCloseOnSelect={false}
                     includeInputInList={true}
-                    options={medias.map((name) => {
+                    options={medias.map((name:string) => {
                         return name.split("/").pop().split(".").shift() as string;
                     })}
                     // value={search}

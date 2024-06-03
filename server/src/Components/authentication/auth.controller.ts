@@ -5,7 +5,9 @@ import {
     serviceRegister, 
     serviceActiveAccount, 
     cleanTokenActivation, 
-    createTokenResetPassword 
+    createTokenResetPassword, 
+    getResetPasswordTokenByEmailUser,
+    deleteTokenResetPassword
 } from './auth.service';
 import { getUserByEmail, updatePassword } from '../user/user.service';
 import Regex from '../../Utils/regex';
@@ -14,6 +16,7 @@ import mail from '../../Utils/mails/sendMail';
 import Bcrypt from '../../Utils/bcrypt';
 import { log } from 'node:console';
 import cookieParser from '../../Utils/cookieParser';
+import { get } from 'node:https';
 
 
 export default {
@@ -28,7 +31,7 @@ export default {
         if (!loginData.email || !loginData.password || loginData.email === "" || loginData.password === "") return res.status(400).send("Missing email or password");
         const user = await serviceLogin(loginData);
         if (!user) return res.status(400).json({fr: "Identifiant incorrect", en: "Incorrect identifier"});
-        const token = jwtoken.generateToken({email:user.email, role:user.role.role.name}, "24h");
+        const token = jwtoken.generateToken({email:user.email, role:user.role.role.name}, "72h");
         cookieParser.setCookieValue("token", token, res);
         return res.status(200).json({token:token});
     },
@@ -43,7 +46,7 @@ export default {
         if (!loginData.email || !loginData.password || loginData.email === "" || loginData.password === "") return res.status(400).send({fr: "Identifiant incorrect", en: "Incorrect identifier"});
         const user = await serviceLogin(loginData, true);
         if (!user) return res.status(400).json({fr: "Identifiant incorrect", en: "Incorrect identifier"});
-        const token = jwtoken.generateToken({email:user.email, role:user.role.role.name}, "24h");
+        const token = jwtoken.generateToken({email:user.email, role:user.role.role.name}, "72h");
         cookieParser.setCookieValue("token", token, res);
         // console.log(res.cookie("token", token));
         return res.status(200).json({fr: "Connecté", en: "Connected"});
@@ -95,7 +98,13 @@ export default {
         if (lg === undefined || lg === "") lg = "fr";
         if (!email) return res.status(400).json({fr: "Email manquant", en: "Missing email"});
         const user = await getUserByEmail(email);
-        if (!user) return res.status(400).json({fr: "Email invalide", en: "Invalide email"});
+        if (!user) return res.status(400).json({fr: "Error", en: "Error"});
+        if (user.role.role.name === "ADMIN") return res.status(400).json({fr: "Error", en: "Error"});
+        const checkToken = await getResetPasswordTokenByEmailUser(email);
+        if (checkToken) {
+            const deleteToken = await deleteTokenResetPassword(email);
+            if (!deleteToken) return res.status(400).json({fr: "Erreur lors de la suppression du token", en: "Error while deleting token"});
+        }
         const token = jwtoken.generateToken(email);
         const createToken = await createTokenResetPassword(user.email, token );
         if (!createToken) return res.status(400).json({fr: "Erreur lors de la création du token", en: "Error while creating token"});
@@ -113,6 +122,8 @@ export default {
     resetPassword: async (req: Request, res: Response): Promise<Response> => {
         const token = req.params.token;
         const password = req.body.password;
+        console.log("token : ", token);
+        console.log("password : ", password);
         const verifToken = jwtoken.verifyToken(token);
         if (!verifToken) return res.status(400).json({fr: "Token invalide", en: "Invalide token"});
         const decoded = jwtoken.decodeToken(token);

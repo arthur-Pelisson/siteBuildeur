@@ -1,5 +1,5 @@
 'use client'
-import { FormField, formTranslate } from "@/app/types/formValidation";
+import { FormField, TFormTranslate } from "@/app/types/formValidation";
 
 const form: FormField[] = [
     {
@@ -13,12 +13,12 @@ const form: FormField[] = [
             en: "First Name",
         },
         validation: {
-            minCharacters: 2, // Exemple : le prénom doit avoir au moins 2 caractères
+            minCharacters: 2,
             errorMessage: {
                 fr: "Le prénom doit avoir au moins 2 caractères",
                 en: "First Name must have at least 2 characters",
             },
-            required: true, // Exemple : le prénom est obligatoire
+            required: true, 
             errorMessageRequired: {
                 fr: "Le prénom est obligatoire",
                 en: "First Name is required",
@@ -36,12 +36,12 @@ const form: FormField[] = [
             en: "Last Name",
         },
         validation: {
-            minCharacters: 2, // Exemple : le nom doit avoir au moins 2 caractères
+            minCharacters: 2,
             errorMessage: {
                 fr: "Le nom doit avoir au moins 2 caractères",
                 en: "Last Name must have at least 2 characters",
             },
-            required: true, // Exemple : le prénom est obligatoire
+            required: true, 
             errorMessageRequired: {
                 fr: "Le nom est obligatoire",
                 en: "Last Name is required",
@@ -59,12 +59,12 @@ const form: FormField[] = [
             en: "Email",
         },
         validation: {
-            regex: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, // Exemple de regex pour un email simple
+            regex: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, 
             errorMessage: {
                 fr: "Format d'email incorrect",
                 en: "Incorrect email format",
             },
-            required: true, // Exemple : le prénom est obligatoire
+            required: true,
             errorMessageRequired: {
                 fr: "Le mail est obligatoire",
                 en: "Email is required",
@@ -128,7 +128,7 @@ const form: FormField[] = [
     },
 ];
 
-const formTranslate: formTranslate = {
+const formTranslate: TFormTranslate = {
     title: {
         fr: "Inscription",
         en: "Register",

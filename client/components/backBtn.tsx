@@ -1,8 +1,12 @@
+'use client'
 import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import { useLanguage } from '@/contextProvider/languageProvider';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import React from 'react';
+import { useRouter } from 'next/navigation'
+import { Button } from '@mui/material';
+
 
 const translate = {
     back: {
@@ -22,12 +26,20 @@ type TBackBtn = {
 
 const BackBtn = ({url, Icon = <KeyboardReturnIcon />, style, color, text=translate.back} :TBackBtn) => {
     const {language} = useLanguage();
+    const router = useRouter();
+    const handleRoute = () => {
+        console.log("url", url);
+        if (url === "") {
+            return router.back();
+        }
+        router.push(url);
+    };
 
     return (
         <div className={style}>
-            <Link href={url} className={`text-${color}`}>
+            <button type="button"  onClick={handleRoute} className={`text-${color}`}>
                 {text[language]} <IconButtonBack Icon={Icon} color={color} />
-            </Link>
+            </button>
         </div>
     )
 };

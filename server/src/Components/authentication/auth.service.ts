@@ -246,3 +246,21 @@ export const getResetPasswordTokenByEmailUser = async (email: string): Promise<s
     if (!token) return false;
     return token.token;
 };
+
+export const deleteTokenResetPassword = async (email: string): Promise<boolean> => {
+    const user = await getUserByEmail(email);
+    if (!user) return false;
+    try {
+        const token = await prisma.jwtoken_reset_password.delete({
+            where: {
+                userId: user.id,
+            },
+            select: {
+                token: true,
+            },
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+};

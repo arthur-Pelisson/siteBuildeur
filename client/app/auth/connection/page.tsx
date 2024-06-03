@@ -5,7 +5,7 @@ import { useLanguage } from "@/contextProvider/languageProvider";
 import { connection } from "./type";
 import { formValidation } from "@/utils/formValidation";
 import Loading from "../../../components/loading";
-import { useToken, Token } from "@/contextProvider/tokenProvider";
+import { useToken } from "@/contextProvider/tokenProvider";
 import { useConnection } from "../../request/requestAuth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -61,7 +61,7 @@ const ConnectionPage = () => {
     };
 
     return (
-        <main className="flex bg-slate-300 items-center justify-center " style={{ height: `calc(100vh - 4rem - 3rem)` }}>
+        <div className="flex bg-slate-300 items-center justify-center " style={{ height: `calc(100vh - 4rem - 3rem)` }}>
             <Loading display={loading} />
             <div className="w-full max-w-md p-8 bg-white rounded-md shadow-md">
                 <div className="text-red-700 text-center">{error && error[language]}</div>
@@ -95,8 +95,14 @@ const ConnectionPage = () => {
                         {formTranslate.textFootFormB[language]}
                     </Link>
                 </p>
+                <p className="text-black text-sm mt-1">
+                    {formTranslate.forgotPassword[language]}  &nbsp;
+                    <Link className="text-sky-600" href="/auth/forgotPassword" passHref>
+                        {formTranslate.forgotPasswordLink[language]}
+                    </Link>
+                </p>
             </div>
-        </main>
+        </div>
     );
 };
 

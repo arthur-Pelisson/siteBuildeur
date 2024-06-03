@@ -1,10 +1,10 @@
 "use client";
 import 'dotenv/config'
 import { useEffect, useState } from "react";
-import { getPostByType, deletePostById, setPublishPost } from "../request/requestPost";
+import { getPostByType, deletePostById, setPublishPost, deleteMultiplePostsById } from "../request/requestPost";
 import Loading from "@/components/loading/loading";
 import useTranslation from "@/hooks/translation/useTranslation";
-import { Button, Tooltip } from "@mui/material";
+import { Button, Checkbox, Tooltip } from "@mui/material";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
@@ -34,7 +34,7 @@ const PageEditions = () => {
         Success: successdelete,
         fetchRequest: FdeletePost,
         params: deleteParams,
-    } = deletePostById();
+    } = deleteMultiplePostsById();
     const {
         response: respublish,
         Error: errpublish,
@@ -45,9 +45,10 @@ const PageEditions = () => {
     } = setPublishPost();
     const { getTranslation: t } = useTranslation();
     const [openDialog, setOpenDialog] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState({ id: 0, title: "" });
+    const [itemsToDelete, setItemsToDelete] = useState<any []>([]);
     const [itemToPublish, setItemToPublish] = useState({ id: 0, title: "", published: false });
     const [snackBar, setSnackBar] = useState({ open: false, message: "", type: "" });
+    const [selection, setSelection] = useState<any[]>([]);
 
     useEffect(() => {
         if (successpost) {
@@ -57,15 +58,17 @@ const PageEditions = () => {
 
     useEffect(() => {
         if (successdelete && !loaddelete) {
-            setSnackBar({ open: true, message: "Livre suprimmé avec succès", type: "success" });
-            console.log("itemToDelete", itemToDelete);
+            setSnackBar({ open: true, message: "Réalisation suprimmé avec succès", type: "success" });
+            console.log("itemToDelete", itemsToDelete);
             console.log("posts", posts);
-            setPosts((posts as any).filter((post: any) => post.id !== itemToDelete.id));
-            setItemToDelete({ id: 0, title: "" });
+            setPosts((posts as any).filter((post: any) => {
+                return !itemsToDelete.find((item) => item.id === post.id);
+            }));
+            setItemsToDelete([]);
         }
         if (errdelete && !loaddelete) {
-            setSnackBar({ open: true, message: "Erreur lors de la supression ddu livre", type: "error" });
-            setItemToDelete({ id: 0, title: "" });
+            setSnackBar({ open: true, message: "Erreur lors de la supression de la Réalisation", type: "error" });
+            setItemsToDelete([]);
         }
     }, [resdelete, errdelete, loaddelete, successdelete]);
 
@@ -89,15 +92,27 @@ const PageEditions = () => {
             setItemToPublish({ id: 0, title: "", published: false });
         }
         if (errpublish && !loadpublish) {
-            setSnackBar({ open: true, message: "Erreur lors de la publication du post realisation", type: "error" });
+            setSnackBar({ open: true, message: "Erreur lors de la publication du post réalisation", type: "error" });
             setItemToPublish({ id: 0, title: "", published: false });
         }
     }, [respublish, errpublish, loadpublish, successpublish]);
 
-    const handleDeleteItem = (IDitemToDelete: number, titleItem: string) => {
-        setItemToDelete({ id: IDitemToDelete, title: titleItem });
+    const handleDeleteItems = (items: number[]) => {
+        console.log("items", items);
+        let itemsArray:any = [];
+        items.map((itemsID: number) => {
+            let item = (posts as any).find((post: any) => post.id === itemsID);
+            let title = t(item.translations, "title", "fr");
+            itemsArray.push({ id: itemsID, title: title });
+        });
+        setItemsToDelete(itemsArray);
         setOpenDialog(true);
     };
+
+
+    const setSelectionRows = (newSelectionModel: any) => {
+        setSelection(newSelectionModel);
+    }
 
     const handlePublish = (IDitemToPublish: number, titleItem: string, published: boolean) => {
         setOpenDialog(false);
@@ -109,19 +124,22 @@ const PageEditions = () => {
         setOpenDialog(false);
         if (!response) return;
         setSnackBar({ open: false, message: "", type: "" });
-        FdeletePost({ url: `${deleteParams.url}realization/${itemToDelete.id}`, method: deleteParams.method });
+        console.log("itemsToDelete", itemsToDelete);
+        FdeletePost({ url: `${deleteParams.url}/realization`, method: deleteParams.method, data: itemsToDelete });
     };
     console.log(`${process.env.NEXT_PUBLIC_API_CLIENTHOST}/productions?slug=`)
     return (
         <div className="text-center">
-            <AlertDialog
-                openDial={openDialog}
-                callbackResponse={handleConfirmDeleteMedia}
-                btnOk={"Confirmer"}
-                btnRefuse={"Annuler"}
-                title="Suprimmer un article"
-                message={`Etes vous sure de vouloir suprimer cette article "${itemToDelete.title}" ? `}
-            />
+            {itemsToDelete.length > 0 && (
+                <AlertDialog
+                    openDial={openDialog}
+                    callbackResponse={handleConfirmDeleteMedia}
+                    btnOk={"Confirmer"}
+                    btnRefuse={"Annuler"}
+                    title="Suprimmer un article"
+                    message={`Etes vous sure de vouloir suprimer ${itemsToDelete.length === 1 ? "cette" : "ces" } article${itemsToDelete.length === 1 ? "s" : ""} ${itemsToDelete.map((item) => `"${item.title}"`)} ? `}
+                />
+            )}
             <SnackBar
                 open={snackBar.open}
                 message={snackBar.message}
@@ -138,11 +156,29 @@ const PageEditions = () => {
                 </div>
                 <div className="h-[80%] w-[90%] text-center">
                     {loadpost && <Loading />}
+                    <div className={`${selection.length === 0 ? "opacity-0": "" }`}>
+                        
+                            <div className="flex flex-row  items-center">
+                                <p>{selection.length} éléments selectionné</p>
+                                <Tooltip title={"Supprimer les éléments sélectionnés."}>
+                                <Button
+                                    className='!rounded-full !h-[50px] !w-[50px] !ml-1'
+                                    disabled={loaddelete ? true : false || loadpublish ? true : false}
+                                    variant="contained"
+                                    color="error"
+                                    onClick={() => handleDeleteItems(selection)}
+                                >
+                                     <DeleteForeverIcon />
+                                </Button>
+                                </Tooltip>
+                            </div>
+                    </div>
                     {posts && (
                         <DataGrid
                             rows={posts}
+                            
                             columns={[
-                                { field: "id", headerName: "ID", width: 130 },
+                                // { field: "id", headerName: "ID", width: 130 },
                                 {
                                     field: "slug",
                                     headerName: "Nom unique",
@@ -238,7 +274,7 @@ const PageEditions = () => {
                                                     disabled={loaddelete ? true : false || loadpublish ? true : false}
                                                     color="error"
                                                     variant="contained"
-                                                    onClick={() => handleDeleteItem(params.row.id, t(params.row.translations, "title", "fr"))}
+                                                    onClick={() => handleDeleteItems([params.row.id])}
                                                 >
                                                     <DeleteForeverIcon />
                                                 </Button>
@@ -271,6 +307,11 @@ const PageEditions = () => {
                                     ),
                                 },
                             ]}
+                            checkboxSelection
+                            // gridRowId={(row: any) => row.id}
+                            onRowSelectionModelChange={(newSelectionModel) => {
+                                setSelectionRows(newSelectionModel);
+                              }}
                             initialState={{
                                 pagination: {
                                     paginationModel: { page: 0, pageSize: 15 },

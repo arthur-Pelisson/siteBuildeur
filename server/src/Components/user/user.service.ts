@@ -65,6 +65,7 @@ export const getPasswordByUserId = async (id: number): Promise<string | false> =
     }
    
 };
+
 export const getUserByEmail = async (email: string, id: number|false = false): Promise<IUser | false> => {
     try {
         const user = await prisma.user.findUnique({

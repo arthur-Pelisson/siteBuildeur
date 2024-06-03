@@ -1,14 +1,12 @@
 "useClient";
-import Loading from "@/components/loading";
-import { Reorder, motion } from "framer-motion";
+import { Reorder} from "framer-motion";
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { getTags, getTagsByType } from "@/app/request/requestTag";
+import { getTagsByType } from "@/app/request/requestTag";
 import Filter from "./filters";
 import { getTagsFromPost } from "@/utils/getTagsFromPost";
 import { useLanguage } from "@/contextProvider/languageProvider";
 import centerGrid from "../layoutComp/centerGrid";
-import { ClassNames } from '@emotion/react';
-import { v4 as uuidv4 } from 'uuid';
+
 type Tag = {
     id: number;
     tag_translate: [
@@ -32,7 +30,7 @@ const GridPosts = ({
     useCenterFlex = false,
 }) => {
     console.log("responseChildren", responseChildren);
-    const mainDiv = useRef<HTMLElement>(null);
+    const mainDiv = useRef<HTMLDivElement>(null);
     const { language } = useLanguage();
     const { response: responseTags, Error: errorTags, Success: successTags, Loading: loadingTags, fetchRequest, params } = getTagsByType(typePost);
     const [filters, setFilters] = useState<Tag[]>([]);

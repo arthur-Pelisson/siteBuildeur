@@ -39,6 +39,13 @@ export const deletePostById = () => {
     return { response, Error, Loading, Success, fetchRequest, params:{url, method} }
 }
 
+export const deleteMultiplePostsById = () => {
+    const { Data: response, Error, Loading, Success, fetchRequest } = useRequest();
+    const url = '/posts';
+    const method = 'DELETE';
+    return { response, Error, Loading, Success, fetchRequest, params:{url, method} }
+}
+
 export const setPublishPost = () => {
     const { Data: response, Error, Loading, Success, fetchRequest } = useRequest();
     const url = '/post/';

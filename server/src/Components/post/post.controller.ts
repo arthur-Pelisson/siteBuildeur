@@ -256,6 +256,18 @@ export default {
         return res.status(200).send({ fr: "Post deleted" });
     },
 
+    deleteMultiplePosts: async (req: Request, res: Response): Promise<Response> => {
+        const postId = req.body;
+        console.log("postId", postId);
+        if (postId.length === 0) return res.status(400).send({ fr: "Empty request" }); 
+        postId.map(async (items:any) => {
+            const post = await deletePostById(items.id);
+            if (!post) return res.status(400).send({ fr: "Post not found" });
+        });
+        return res.status(200).send({ fr: "Posts deleted" });
+    },
+    
+
     publierPost: async (req: Request, res: Response): Promise<Response> => {
         const id = parseInt(req.params.id);
         let type = req.params.type;

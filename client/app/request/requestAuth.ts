@@ -32,3 +32,17 @@ export const logout = () => {
     const method = 'POST';
     return { response, Error, Loading, Success, fetchRequest, params:{url, method} }
 };
+
+export const forgotPassword =() => {
+    const { Data: response, Error, Loading, Success, fetchRequest } = useRequest();
+    const url = '/auth/forgot-password';
+    const method = 'POST';
+    return { response, Error, Loading, Success, fetchRequest, params:{url, method} }
+}
+
+export const resetPassword = () => {
+    const { Data: response, Error, Loading, Success, fetchRequest } = useRequest();
+    const url = '/auth/reset-password/';
+    const method = 'POST';
+    return { response, Error, Loading, Success, fetchRequest, params:{url, method} }
+}

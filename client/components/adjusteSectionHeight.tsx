@@ -23,21 +23,18 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     
         const adjustSectionHeight = () => {
             const screenW = window.innerWidth;
-            const screenH = window.innerHeight;
             if (sectionRef.current) {
-                // if (screenH < screenW) {
-                    const height = window.innerHeight - sectionRef.current.offsetTop;
-                    const getElementFooter = document.querySelector("footer");
-                    if (getElementFooter) {
-                        const heightFooter = getElementFooter.clientHeight;
-                        if (height > 1.5* screenW) {
-                            setHeightSection(screenW * 2);
-                            return;
-                        }
-                        sectionRef.current.style.minHeight = `${height - heightFooter}px`;
-                        setHeightSection(height - heightFooter);
+                const height = window.innerHeight - sectionRef.current.offsetTop;
+                const getElementFooter = document.querySelector("footer");
+                if (getElementFooter) {
+                    const heightFooter = getElementFooter.clientHeight;
+                    if (height > 1.5* screenW) {
+                        setHeightSection(screenW * 2);
+                        return;
                     }
-                // }
+                    sectionRef.current.style.minHeight = `${height - heightFooter}px`;
+                    setHeightSection(height - heightFooter);
+                }
             }
         }
 

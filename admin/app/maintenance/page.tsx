@@ -47,7 +47,7 @@ const MaintenancePage = () => {
     useEffect(() => {
         if (successMaintenance) {
             console.log("respsonse maintenance : ", resMaintenance);
-            setContent(resMaintenance.mnt);
+            setContent(resMaintenance);
         }
     }, [resMaintenance, successMaintenance, errorMaintenance, loadingMaintenance]);
     

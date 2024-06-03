@@ -38,6 +38,13 @@ const photography = ({ slug }) => {
     const [stopPage, setStopPage] = useState(false);
     const { loadMoreRef, page, setPage } = useInfinitScroll({ initPage: 1, treshold: 1, rootMargin: "0px", stopPage: stopPage });
     const [ready, setReady] = useState<boolean[]>([]);
+    const { getTranslation } = useTranslation();
+    const {
+        response: detailsResponse,
+        Error: detailsError,
+        Loading: detailsLoading,
+        Success: detailsSuccess,
+    } = getPostBySlug(slug.replace(/-/g, " "), "photography");
 
     const loadImages = async (urls: any) => {
         console.log("urls", urls);
@@ -88,6 +95,13 @@ const photography = ({ slug }) => {
         checkLoading();
     }, [ready]);
 
+    useEffect(() => {
+        if (detailsSuccess) {
+            console.log("detailsResponse", detailsResponse);
+            loadImages((detailsResponse as unknown as photography).imagesPost);
+        }
+    }, [detailsResponse]);
+    
     const checkLoading = () => {
         for (let i = 0; i < ready.length; i++) {
             if (!ready[i] || ready[i] === undefined) {
@@ -99,20 +113,6 @@ const photography = ({ slug }) => {
         setLoading(false);
     };
 
-    const { getTranslation } = useTranslation();
-    const {
-        response: detailsResponse,
-        Error: detailsError,
-        Loading: detailsLoading,
-        Success: detailsSuccess,
-    } = getPostBySlug(slug.replace(/-/g, " "), "photography");
-
-    useEffect(() => {
-        if (detailsSuccess) {
-            console.log("detailsResponse", detailsResponse);
-            loadImages((detailsResponse as unknown as photography).imagesPost);
-        }
-    }, [detailsResponse]);
 
     if (detailsError) {
         return notFound();

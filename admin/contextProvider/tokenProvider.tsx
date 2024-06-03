@@ -40,7 +40,7 @@ export const TokenProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setToken(false);
     };
 
-    if (loading) return;
+    // if (loading) return;
 
   return (
     <TokenContext.Provider value={{token, setToken, removeToken}}>

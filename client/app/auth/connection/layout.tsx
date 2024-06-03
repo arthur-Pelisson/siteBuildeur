@@ -20,9 +20,7 @@ export default function ConnectionLayout({ children }: { children: React.ReactNo
         <>
             <title>{tradMetadata.title[language]}</title>
             <meta name="description" content={tradMetadata.description[language]} />
-            <section className="min-height-section">
-                    {children}
-            </section>
+            {children}
         </>
     );
 }

@@ -17,6 +17,11 @@ const PathWrapper = ({ children }: { children: React.ReactNode }) => {
     const { token } = useToken();
 
     useEffect(() => {
+        if (token === null) return; 
+        checkAuth();
+      }, [token, pathname]);
+
+      const checkAuth = () => {
         setLoading(true);
         const {authorisation, redirect} = getAuthorisation();
         if (authorisation === false) {
@@ -25,7 +30,7 @@ const PathWrapper = ({ children }: { children: React.ReactNode }) => {
         if (authorisation === true) {
             setLoading(false);
         }
-      }, [token, pathname]);
+      }
       
     if (loading) {
         return <Loading display={true} />;

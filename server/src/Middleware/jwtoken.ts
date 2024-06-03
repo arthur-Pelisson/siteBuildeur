@@ -24,7 +24,7 @@ class jwtoken {
             if (expire !== "") {
                 return jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: expire});
             }   
-            return jwt.sign({payload}, process.env.SECRET_KEY);
+            return jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: "24h"});
         } catch (error) {
             console.log(error);
         }
@@ -78,7 +78,7 @@ class jwtoken {
                 return res.status(401).json({ message: 'Jwtoken revoqued' });
             }
             const decoded = jwtoken.decodeToken(token);
-            const newToken = jwtoken.generateToken({ email: (decoded as Payload).email, role: (decoded as Payload).role }, "24h");
+            const newToken = jwtoken.generateToken({ email: (decoded as Payload).email, role: (decoded as Payload).role }, "72h");
             cookieParser.setCookieValue("token", newToken, res);
             (<CustomRequest>req).user = {
                 tokenEmail: (decoded as Payload).email,
